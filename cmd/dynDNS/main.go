@@ -10,6 +10,7 @@ import (
 
 	"github.com/ofgrenudo/415/pkg/aws"
 	"github.com/ofgrenudo/415/pkg/net"
+	"github.com/ofgrenudo/415/pkg/version"
 )
 
 const usageText = `NAME
@@ -123,10 +124,18 @@ func (d *domainList) Set(v string) error {
 
 func main() {
 	var domains domainList
+	var showVersion bool
 	flag.Usage = usage
 	flag.Var(&domains, "domain", "Domain to update in Route 53 (repeatable)")
 	flag.Var(&domains, "d", "Shorthand for --domain (repeatable)")
+	flag.BoolVar(&showVersion, "version", false, "Print version information and exit")
+	flag.BoolVar(&showVersion, "v", false, "Shorthand for --version")
 	flag.Parse()
+
+	if showVersion {
+		fmt.Println(version.String("dynDNS"))
+		return
+	}
 
 	if len(domains) == 0 {
 		slog.Error("At least one --domain/-d flag is required.")
