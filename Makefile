@@ -23,7 +23,7 @@ build: $(BINARIES)
 
 $(BINARIES):
 	@mkdir -p $(BIN_DIR)
-	go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$@ ./cmd/$@
+	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$@ ./cmd/$@
 
 clean:
 	rm -rf $(BIN_DIR)
