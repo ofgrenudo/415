@@ -15,7 +15,7 @@ func GetIPv4() net.IP {
 		slog.Error("There was an unexpected error getting the IP from https://ipv4.icanhazip.com", "Error Message", err)
 		return nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
