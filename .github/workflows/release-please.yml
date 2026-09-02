@@ -1,0 +1,99 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      dyndns_released: ${{ steps.release.outputs['cmd/dynDNS--release_created'] }}
+      dyndns_tag: ${{ steps.release.outputs['cmd/dynDNS--tag_name'] }}
+      c415_released: ${{ steps.release.outputs['cmd/415--release_created'] }}
+      c415_tag: ${{ steps.release.outputs['cmd/415--tag_name'] }}
+      example_released: ${{ steps.release.outputs['cmd/example--release_created'] }}
+      example_tag: ${{ steps.release.outputs['cmd/example--tag_name'] }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  build-and-upload-dynDNS:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.dyndns_released == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.dyndns_tag }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build
+        run: |
+          TAG="${{ needs.release-please.outputs.dyndns_tag }}"
+          VERSION="${TAG#dynDNS-v}"
+          COMMIT="$(git rev-parse --short HEAD)"
+          make dynDNS VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
+      - name: Upload release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.dyndns_tag }}" "bin/dynDNS" --clobber
+
+  build-and-upload-415:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.c415_released == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.c415_tag }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build
+        run: |
+          TAG="${{ needs.release-please.outputs.c415_tag }}"
+          VERSION="${TAG#415-v}"
+          COMMIT="$(git rev-parse --short HEAD)"
+          make 415 VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
+      - name: Upload release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.c415_tag }}" "bin/415" --clobber
+
+  build-and-upload-example:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.example_released == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.example_tag }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build
+        run: |
+          TAG="${{ needs.release-please.outputs.example_tag }}"
+          VERSION="${TAG#example-v}"
+          COMMIT="$(git rev-parse --short HEAD)"
+          make example VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
+      - name: Upload release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.example_tag }}" "bin/example" --clobber
