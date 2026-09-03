@@ -20,7 +20,7 @@ jobs:
       example_released: ${{ steps.release.outputs['cmd/example--release_created'] }}
       example_tag: ${{ steps.release.outputs['cmd/example--tag_name'] }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           config-file: release-please-config.json
