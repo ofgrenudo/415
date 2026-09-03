@@ -1,5 +1,5 @@
 {
-  "cmd/dynDNS": "0.1.0",
+  "cmd/dynDNS": "0.2.0",
   "cmd/415": "0.2.0",
-  "cmd/example": "0.1.0"
+  "cmd/example": "0.2.0"
 }
