@@ -1,0 +1,30 @@
+name: ci-repo
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  no-cgo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: forbid enabling cgo
+        run: |
+          # Keep binaries statically linked and cross-platform: nothing in the
+          # repo may turn cgo on. Pattern is written to not match itself.
+          if git grep -nE 'CGO_ENABLED[[:space:]=]+["'"'"']?[1-9]' -- . ':!.github/workflows/ci-repo.yml'; then
+            echo "::error::cgo must stay disabled (CGO_ENABLED=0); found an override above"
+            exit 1
+          fi
+
+  spellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@v1

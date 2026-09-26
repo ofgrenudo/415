@@ -1,0 +1,40 @@
+baseURL = 'https://www.unorthodoxdev.net/'
+languageCode = 'en-us'
+title = 'Unorthodoxdev'
+theme = 'portal'
+
+enableEmoji = true
+
+[params]
+  comment_server = "http://localhost:8080"
+
+  # portal theme
+  handle  = "joshua"
+  role    = "systems analyst / developer"
+  tagline = "welcome to my little internet home. please ignore any broken links."
+  # posters in static/img/propaganda that should never be picked
+  posters_exclude = ["american_centry_of_humilitation.jpg", "mamdani_unlimited_genocide.jpg"]
+
+  # now.txt panel. leave a key empty to hide that row. markdown works.
+  [params.now]
+    building  = ""
+    playing   = ""
+    watching  = "[what im watching](/shrines/movies/imwatching/)"
+    listening = "[what im listening to](/shrines/music/what_im_listening_to/)"
+    reading   = ""
+
+  # work panel. add one [[params.work]] block per project. hidden when empty.
+  # [[params.work]]
+  #   title = "project name"
+  #   stack = "python, airflow"
+  #   desc  = "one line on what it does"
+  #   url   = ""
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+

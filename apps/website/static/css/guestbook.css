@@ -1,0 +1,30 @@
+.comment_block {
+    background-color:darkkhaki;
+    width: auto;
+    box-sizing: border-box;
+    padding: 10px;
+    padding-right: 20px;
+}
+
+.comment_inputs {
+    width: 100%;
+}
+
+.comment_button {
+  padding: 10px;
+}
+
+.single_opinion {
+    border: 2px dashed black;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 10px;
+}
+
+@media only screen and (max-width: 900px) {
+  .comment_inputs {
+    width: 95%;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}

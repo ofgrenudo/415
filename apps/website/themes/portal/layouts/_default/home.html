@@ -1,0 +1,151 @@
+{{ define "main" }}
+{{- $blog := site.GetPage "/blog" }}
+{{- $posts := slice }}
+{{- with $blog }}{{ $posts = .Pages.ByDate.Reverse }}{{ end }}
+{{- $shrines := where site.RegularPages "Section" "shrines" }}
+{{- $todo := site.GetPage "/todo" }}
+{{- $updates := site.GetPage "/updates" }}
+{{- $now := site.Params.now }}
+
+<div class="grid">
+
+  <div class="col left-col">
+    {{ partial "directory.html" . }}
+  </div>
+
+  <div class="col main-col">
+    {{- range first 1 $posts }}
+    <article class="win">
+      <div class="bar"><h2 class="c2">latest post</h2><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "06.01.02" }}</time></div>
+      <div class="featured">
+        <div class="thumb">
+          {{- with .Params.image }}
+            <img src="{{ . }}" alt="" loading="lazy">
+          {{- else }}
+            <div class="ph pixelated" style="height: 100%">{{ partial "heart.html" 8 }}</div>
+          {{- end }}
+        </div>
+        <div class="txt">
+          <a class="title" href="{{ .RelPermalink }}">{{ .LinkTitle | lower }}</a>
+          <div class="excerpt">{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 220 }}{{ end }}</div>
+          <div class="go">
+            <a class="btn primary" href="{{ .RelPermalink }}">read post</a>
+            {{- with $blog }}<a class="btn" href="{{ .RelPermalink }}">all posts</a>{{ end }}
+          </div>
+        </div>
+      </div>
+    </article>
+    {{- end }}
+
+    <section class="win" data-tabs aria-label="browse">
+      <div class="tabs" role="tablist">
+        {{- if $updates }}<button class="tab" role="tab" id="tab-updates" aria-controls="pane-updates" aria-selected="true" type="button">updates</button>{{ end }}
+        <button class="tab" role="tab" id="tab-blog" aria-controls="pane-blog" aria-selected="false" type="button">blog</button>
+        {{- if $shrines }}<button class="tab" role="tab" id="tab-shrines" aria-controls="pane-shrines" aria-selected="false" type="button">shrines</button>{{ end }}
+      </div>
+      {{- with $updates }}
+      <div class="pane body prose" id="pane-updates" role="tabpanel" aria-labelledby="tab-updates">
+        {{ .Content | replaceRE `(?s)<h2.*?</h2>` "" | safeHTML }}
+      </div>
+      {{- end }}
+      <div class="pane body" id="pane-blog" role="tabpanel" aria-labelledby="tab-blog">
+        {{- range first 4 $posts }}
+        <div class="post"><span class="date">{{ .Date.Format "06.01.02" }}</span><a href="{{ .RelPermalink }}">{{ .LinkTitle | lower }}</a></div>
+        {{- else }}
+        <p>no posts yet.</p>
+        {{- end }}
+        {{- with $blog }}{{ if gt (len $posts) 4 }}<div class="post"><a href="{{ .RelPermalink }}">view all posts &rarr;</a></div>{{ end }}{{ end }}
+      </div>
+      {{- if $shrines }}
+      <div class="pane" id="pane-shrines" role="tabpanel" aria-labelledby="tab-shrines">
+        {{ partial "shrine-tiles.html" (dict "pages" $shrines "class" "three") }}
+      </div>
+      {{- end }}
+    </section>
+  </div>
+
+  <div class="col right-col">
+    {{- if $posts }}
+    <section class="win">
+      <div class="bar"><h2 class="c1">latest 10</h2><span>by date</span></div>
+      <div class="body ranked">
+        {{- range $i, $p := first 10 $posts }}
+        <div class="row"><span class="rank{{ if lt $i 3 }} top{{ end }}">{{ printf "%02d" (add $i 1) }}</span><a href="{{ $p.RelPermalink }}">{{ $p.LinkTitle | lower }}</a></div>
+        {{- end }}
+      </div>
+    </section>
+    {{- end }}
+
+    {{- $rows := slice }}
+    {{- if $now }}{{ range slice "watching" "listening" }}{{ with index $now . }}{{ $rows = $rows | append . }}{{ end }}{{ end }}{{ end }}
+    {{- if $rows }}
+    <section class="win">
+      <div class="bar"><h2>now.txt</h2><span class="c5">live</span></div>
+      <div class="body">
+        {{- range slice "watching" "listening" }}
+          {{- $k := . }}
+          {{- with index $now $k }}
+          <div class="row"><span>{{ . | markdownify }}</span></div>
+          {{- end }}
+        {{- end }}
+      </div>
+    </section>
+    {{- end }}
+  </div>
+
+</div>
+
+{{- if $shrines }}
+<section class="win">
+  <div class="bar"><h2 class="c7">shrine wall</h2>{{ with site.GetPage "/shrines" }}<a href="{{ .RelPermalink }}">all shrines &rarr;</a>{{ end }}</div>
+  {{ partial "shrine-tiles.html" (dict "pages" $shrines "class" "wall") }}
+</section>
+{{- end }}
+
+{{- $posters := slice }}
+{{- $skip := site.Params.posters_exclude | default slice }}
+{{- with try (os.ReadDir "static/img/propaganda") }}
+  {{- if not .Err }}
+    {{- range .Value }}{{ if and (not .IsDir) (not (in $skip .Name)) (findRE `(?i)\.(jpe?g|png|gif|webp)$` .Name) }}{{ $posters = $posters | append (printf "/img/propaganda/%s" .Name) }}{{ end }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- $guestbook := site.GetPage "/page/guestbook" }}
+
+<div class="quad">
+  {{- if $posters }}
+  <section class="win">
+    <div class="bar"><h2 class="c5">poster of the load</h2><span>refresh for another</span></div>
+    <div class="body poster"><img id="poster" src="{{ index (shuffle $posters) 0 }}" data-posters='{{ $posters | jsonify }}' alt="a random propaganda poster"></div>
+  </section>
+  {{- end }}
+
+  {{- with site.Params.work }}
+  <section class="win">
+    <div class="bar"><h2 class="c6">work</h2><span>things i ship</span></div>
+    <div class="body">
+      {{- range . }}
+      <div class="row" style="flex-direction: column; gap: 2px">
+        <span class="date">{{ .stack }}</span>
+        {{- if .url }}<a href="{{ .url }}">{{ .title }}</a>{{ else }}<span>{{ .title }}</span>{{ end }}
+        {{- with .desc }}<span style="color: var(--soft); font-size: 14px">{{ . }}</span>{{ end }}
+      </div>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  {{- with $guestbook }}
+  <section class="win">
+    <div class="bar"><h2 class="c3">guestbook</h2><a href="{{ .RelPermalink }}">sign &rarr;</a></div>
+    <div class="body"><p style="margin: 0">leave a note. say hi.</p></div>
+  </section>
+  {{- end }}
+
+  {{- with $todo }}
+  <section class="win">
+    <div class="bar"><h2 class="c4">todo list of shame</h2><a href="{{ .RelPermalink }}">/todo</a></div>
+    <div class="body prose">{{ .Content | replaceRE `(?s)<h2.*?</h2>` "" | safeHTML }}</div>
+  </section>
+  {{- end }}
+</div>
+{{ end }}

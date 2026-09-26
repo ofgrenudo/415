@@ -1,0 +1,14 @@
+{{- with resources.Get "css/main.css" }}
+  {{- if eq hugo.Environment "development" }}
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="{{ .RelPermalink }}"> 
+  {{- else }}
+    {{- with . | minify | fingerprint }}
+      <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+<link rel="stylesheet" href="/css/light.css" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/dark.css"  media="(prefers-color-scheme: dark)">
+

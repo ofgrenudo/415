@@ -1,6 +1,6 @@
 MODULE     := github.com/ofgrenudo/415
 BIN_DIR    := bin
-BINARIES   := $(notdir $(wildcard cmd/*))
+BINARIES   := $(patsubst apps/%/main.go,%,$(wildcard apps/*/main.go))
 
 # Overridable from the environment/CLI, e.g. by CI after release-please
 # has computed the next version:
@@ -23,7 +23,7 @@ build: $(BINARIES)
 
 $(BINARIES):
 	@mkdir -p $(BIN_DIR)
-	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$@ ./cmd/$@
+	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$@ ./apps/$@
 
 clean:
 	rm -rf $(BIN_DIR)

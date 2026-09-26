@@ -1,0 +1,3 @@
+[files]
+# Website prose/themes are personal writing, not code; typos fails on them.
+extend-exclude = ["apps/website/"]

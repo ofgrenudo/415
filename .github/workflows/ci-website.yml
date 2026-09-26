@@ -1,0 +1,32 @@
+name: ci-website
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/website/**'
+      - '.github/workflows/ci-website.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.166.0"
+          extended: true
+      - name: build
+        run: hugo --gc --minify --destination "$RUNNER_TEMP/public"
+      - name: verify output
+        run: |
+          test -s "$RUNNER_TEMP/public/index.html" || { echo "::error::no index.html generated"; exit 1; }
+          test -s "$RUNNER_TEMP/public/index.xml" || { echo "::error::no RSS feed generated"; exit 1; }

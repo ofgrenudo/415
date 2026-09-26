@@ -4,14 +4,17 @@
   "separate-pull-requests": true,
   "include-component-in-tag": true,
   "packages": {
-    "cmd/dynDNS": {
+    "apps/dyndns": {
       "component": "dynDNS"
     },
-    "cmd/415": {
+    "apps/api": {
       "component": "415"
     },
-    "cmd/example": {
+    "apps/example": {
       "component": "example"
+    },
+    "apps/website": {
+      "component": "website"
     }
   }
 }

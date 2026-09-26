@@ -1,5 +1,6 @@
 {
-  "cmd/dynDNS": "0.1.0",
-  "cmd/415": "0.1.0",
-  "cmd/example": "0.1.0"
+  "apps/dyndns": "0.1.0",
+  "apps/api": "0.1.0",
+  "apps/example": "0.1.0",
+  "apps/website": "0.1.0"
 }

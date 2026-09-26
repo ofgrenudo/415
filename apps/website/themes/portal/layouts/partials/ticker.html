@@ -1,0 +1,26 @@
+{{- /* newest blog posts + shrines, by last-modified date; fully automatic */ -}}
+{{- $items := slice }}
+{{- $pool := where site.RegularPages "Section" "in" (slice "blog" "shrines") }}
+{{- range first 5 (sort $pool "Lastmod" "desc") }}
+  {{- $label := "new post" }}
+  {{- $name := .LinkTitle | lower }}
+  {{- if eq .Section "shrines" }}{{ $label = "shrine updated" }}{{ $name = strings.TrimPrefix "/" .Title }}{{ end }}
+  {{- $items = $items | append (dict "t" (printf "%s: %s" $label $name) "u" .RelPermalink) }}
+{{- end }}
+{{- if $items }}
+<div class="ticker" role="region" aria-label="site news">
+  <div class="badge">NEW</div>
+  <div class="view">
+    <div class="track">
+      {{- range $dup := slice false true }}
+      <div class="set"{{ if $dup }} aria-hidden="true"{{ end }}>
+        {{- range $items }}
+          {{- if .u }}<a href="{{ .u }}"{{ if $dup }} tabindex="-1"{{ end }}>{{ .t }}</a>{{ else }}<span>{{ .t }}</span>{{ end }}
+          <span class="sq">&#9632;</span>
+        {{- end }}
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</div>
+{{- end }}

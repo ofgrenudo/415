@@ -1,0 +1,17 @@
+{{- /*
+Renders a menu.
+
+@context {page} page The current page.
+@context {slice} menuEntries The menu entries.
+*/}}
+{{- $page := .page }}
+{{- $menuEntries := .menuEntries }}
+
+<li>
+  <a href="/">/home</a>
+</li>
+{{- range $menuEntries }}
+  <li>
+    <a href="{{ .URL }}">/{{ .Name }}</a>
+  </li>
+{{- end }}

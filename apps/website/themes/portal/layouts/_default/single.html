@@ -1,0 +1,14 @@
+{{ define "main" }}
+<article class="win article">
+  <div class="bar">
+    <h1>{{ strings.TrimPrefix "/" .Title | lower }}</h1>
+    {{- if and (not .Date.IsZero) (ne .Section "page") }}
+    <time datetime="{{ .Date.Format "2006-01-02T15:04:05-07:00" }}">{{ .Date.Format "06.01.02" }}</time>
+    {{- end }}
+  </div>
+  <div class="body prose">
+    {{ .Content }}
+    <div class="terms">{{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}</div>
+  </div>
+</article>
+{{ end }}

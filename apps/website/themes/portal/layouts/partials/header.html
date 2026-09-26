@@ -1,0 +1,55 @@
+{{- $page := . }}
+{{- $gifs := slice }}
+{{- with try (os.ReadDir "static/gifs") }}
+  {{- if not .Err }}
+    {{- range .Value }}{{ if not .IsDir }}{{ $gifs = $gifs | append (printf "/gifs/%s" .Name) }}{{ end }}{{ end }}
+  {{- end }}
+{{- end }}
+<header>
+  <div class="strip">
+    <nav aria-label="utility">
+      {{- with site.GetPage "/page/guestbook" }}<a href="{{ .RelPermalink }}">guestbook</a>{{ end }}
+    </nav>
+  </div>
+
+  <div class="win masthead" style="margin-top: 14px">
+    <a class="logo" href="/" aria-label="{{ site.Title }} home">
+      <img src="/favicon.gif" width="60" height="60" alt="" style="display:block">
+      <span>
+        <div class="name">{{ site.Params.handle | default (lower site.Title) }}<span class="blink" aria-hidden="true">_</span></div>
+        {{ with site.Params.role }}<div class="tag">{{ . }}</div>{{ end }}
+      </span>
+    </a>
+    <div class="search" role="search">
+      <form id="search-form" action="#" method="get" autocomplete="off">
+        <label class="sr-only" for="q">search the site</label>
+        <input id="q" name="q" type="search" placeholder="search posts, shrines, pages...">
+        <button type="submit">SEARCH</button>
+      </form>
+    </div>
+    {{- if $gifs }}
+    <div class="mascot"><img id="mascot-img" src="{{ index (shuffle $gifs) 0 }}" data-gifs='{{ $gifs | jsonify }}' alt="" width="176" height="64"></div>
+    {{- end }}
+  </div>
+
+  <div class="modal" id="search-modal" hidden>
+    <div class="win modal-box" role="dialog" aria-modal="true" aria-labelledby="search-title">
+      <div class="bar">
+        <h2 id="search-title">search results</h2>
+        <button type="button" class="modal-close" id="search-close" aria-label="close search results">X</button>
+      </div>
+      <div class="body">
+        <ul class="hits" id="results" aria-live="polite"></ul>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="main" style="margin-top: 14px">
+    <a href="/"{{ if $page.IsHome }} aria-current="page"{{ end }}>home</a>
+    {{- range slice (dict "path" "/whoami" "name" "whoami") (dict "path" "/blog" "name" "blog") (dict "path" "/shrines" "name" "shrines") }}
+      {{- $section := .path }}{{ $name := .name }}
+      {{- with or (site.GetPage $section) (site.GetPage (printf "/page%s" $section)) }}<a href="{{ .RelPermalink }}"{{ if or ($page.IsDescendant .) (eq $page .) }} aria-current="page"{{ end }}>{{ $name }}</a>{{ end }}
+    {{- end }}
+  </nav>
+</header>
+{{ partial "ticker.html" . }}

@@ -1,0 +1,8 @@
+{{- /* @context {pages} pages  @context {string} class */ -}}
+{{- $colors := slice 1 2 6 7 4 3 5 }}
+<div class="tiles {{ .class }}">
+  {{- range $i, $p := .pages }}
+    {{- $c := index $colors (mod $i (len $colors)) }}
+    <a class="tile c{{ $c }}" href="{{ $p.RelPermalink }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span>{{ strings.TrimPrefix "/" $p.Title }}</span></a>
+  {{- end }}
+</div>

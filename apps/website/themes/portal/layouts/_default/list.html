@@ -1,0 +1,57 @@
+{{ define "main" }}
+{{- $pages := .Pages }}
+{{- if eq .Section "blog" }}{{ $pages = .Pages.ByDate.Reverse }}{{ end }}
+<section class="win article">
+  <div class="bar"><h1>{{ strings.TrimPrefix "/" .Title | lower }}</h1><span>{{ len $pages }} items</span></div>
+  <div class="body">
+    {{- with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+    {{- if eq .Section "blog" }}
+    <div class="cards">
+      {{- range $i, $p := $pages }}
+      <a class="card c{{ add 1 (mod $i 7) }}" href="{{ .RelPermalink }}">
+        <span class="card-n">#{{ sub (len $pages) $i }}</span>
+        <span class="card-body">
+          <span class="card-meta">
+            {{- if not .Date.IsZero }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>{{ end }}
+            <span>{{ .ReadingTime }} min read</span>
+            {{- range .GetTerms "categories" }}<span class="chip">{{ .LinkTitle | lower }}</span>{{ end }}
+          </span>
+          <span class="card-title">{{ strings.TrimPrefix "/" .LinkTitle | lower }}</span>
+          {{- with .Description }}<span class="card-desc">{{ . }}</span>{{ end }}
+        </span>
+        <span class="card-go" aria-hidden="true">&rarr;</span>
+      </a>
+      {{- end }}
+    </div>
+    {{- else }}
+    {{- if eq .Section "shrines" }}
+      {{- /* group by first tag, alphabetical; untagged pages go under "misc" */ -}}
+      {{- $groups := dict }}
+      {{- range $pages }}
+        {{- $g := "misc" }}
+        {{- with .Params.tags }}{{ $g = index . 0 | lower }}{{ end }}
+        {{- $groups = merge $groups (dict $g (append . (index $groups $g | default slice))) }}
+      {{- end }}
+      {{- range $g, $items := $groups }}
+      <h2 class="ch">{{ $g }}</h2>
+      {{- range sort $items "Title" }}
+      <div class="row" style="flex-wrap: wrap">
+        {{- if not .Date.IsZero }}<span class="date">{{ .Date.Format "06.01.02" }}</span>{{ end }}
+        <a href="{{ .RelPermalink }}" style="font-size: 16px">{{ strings.TrimPrefix "/" .LinkTitle | lower }}</a>
+        {{- with .Description }}<span class="list-desc" style="flex-basis: 100%">{{ . }}</span>{{ end }}
+      </div>
+      {{- end }}
+      {{- end }}
+    {{- else }}
+    {{- range $pages }}
+      <div class="row" style="flex-wrap: wrap">
+        {{- if not .Date.IsZero }}<span class="date">{{ .Date.Format "06.01.02" }}</span>{{ end }}
+        <a href="{{ .RelPermalink }}" style="font-size: 16px">{{ strings.TrimPrefix "/" .LinkTitle | lower }}</a>
+        {{- with .Description }}<span class="list-desc" style="flex-basis: 100%">{{ . }}</span>{{ end }}
+      </div>
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,13 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-US'
+title = 'My New Hugo Site'
+
+[[menus.main]]
+name = 'system-logs'
+url = '/blog'
+pageRef = '/blog'
+
+[module]
+  [module.hugoVersion]
+    extended = false
+    min = "0.116.0"

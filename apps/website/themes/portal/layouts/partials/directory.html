@@ -1,0 +1,23 @@
+<div class="win">
+  <div class="bar"><span>directory</span><span>a-z</span></div>
+  {{- with site.GetPage "/blog" }}
+  <h2 class="ch">READ</h2>
+  <div class="dir">
+    <a href="{{ .RelPermalink }}">blog ({{ len .Pages }} posts)</a>
+    {{- with site.Home.OutputFormats.Get "RSS" }}<a href="{{ .RelPermalink }}">rss feed</a>{{ end }}
+  </div>
+  {{- end }}
+  {{- $shrines := where site.RegularPages "Section" "shrines" }}
+  {{- if $shrines }}
+  <h2 class="ch">SHRINES</h2>
+  <div class="dir">
+    {{- range first 8 $shrines }}<a href="{{ .RelPermalink }}">{{ strings.TrimPrefix "/" .Title }}</a>{{ end }}
+    {{- with site.GetPage "/shrines" }}<a href="{{ .RelPermalink }}">all shrines &rarr;</a>{{ end }}
+  </div>
+  {{- end }}
+  <h2 class="ch">SITE</h2>
+  <div class="dir">
+    {{- range site.Menus.main }}{{ if ne .URL "/shrines" }}<a href="{{ with .Page }}{{ .RelPermalink }}{{ else }}{{ .URL }}{{ end }}">{{ .Name | lower }}</a>{{ end }}{{ end }}
+    {{- range slice "/page/birthdays" }}{{ with site.GetPage . }}<a href="{{ .RelPermalink }}">{{ .LinkTitle | lower }}</a>{{ end }}{{ end }}
+  </div>
+</div>

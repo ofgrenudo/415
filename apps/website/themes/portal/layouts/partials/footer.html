@@ -1,0 +1,14 @@
+<footer class="win foot">
+  <div class="bar">
+    <span>{{ site.Params.handle | default (lower site.Title) }}<span class="blink" aria-hidden="true">_</span></span>
+    <a href="#content">&uarr; back to top</a>
+  </div>
+  <div class="foot-body">
+    <span>&copy; {{ now.Year }} {{ site.Title | lower }} &middot; built with hugo</span>
+    <nav aria-label="footer">
+      {{- with site.GetPage "/page/guestbook" }}<a href="{{ .RelPermalink }}">guestbook</a>{{ end }}
+      {{- with site.Home.OutputFormats.Get "RSS" }}<a href="{{ .RelPermalink }}">rss</a>{{ end }}
+      {{- with site.GetPage "/page/privacy-policy" }}<a href="{{ .RelPermalink }}">privacy policy</a>{{ end }}
+    </nav>
+  </div>
+</footer>

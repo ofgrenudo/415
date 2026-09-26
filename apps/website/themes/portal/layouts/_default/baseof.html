@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang | default `en` }}" dir="ltr">
+  <head>
+    {{ partial "head.html" . }}
+  </head>
+  <body>
+    <a class="skip" href="#content">skip to content</a>
+    <div class="wrap">
+      {{ partial "header.html" . }}
+      <main id="content">{{ block "main" . }}{{ end }}</main>
+      {{ partial "footer.html" . }}
+    </div>
+    {{ partial "head/js.html" . }}
+  </body>
+</html>

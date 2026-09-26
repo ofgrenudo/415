@@ -1,0 +1,25 @@
+{{ define "main" }}
+<style>
+.fucking_hell {
+  margin: 0px;
+  padding: 0px;
+}
+</style>
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+  <br>
+  {{ range .Pages }}
+    <article>
+      <h3 class="fucking_hell"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      <h5 class="fucking_hell">
+        {{ .Date.Format "Jan 2, 2006" }} 
+        {{ with .Params.author }} • {{ . }}{{ end }}
+      </h5>
+      {{ with .Description }}
+        <p class="fucking_hell">{{ . }}</p>
+      {{ end }}
+      <p>
+      </p>
+    </article>
+  {{ end }}
+{{ end }}

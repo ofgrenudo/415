@@ -1,0 +1,15 @@
+name = 'Portal'
+license = 'MIT'
+licenselink = 'https://github.com/joshuawintersbrown/unorthodoxdev.net/blob/main/LICENSE'
+description = 'A dense, pixel-art personal-portal theme for Hugo. Dark, Ember palette, mobile responsive.'
+homepage = 'https://www.unorthodoxdev.net/'
+tags = ['blog', 'personal', 'dark', 'responsive', 'retro']
+features = ['dark theme', 'responsive', 'client-side search', 'scrolling ticker', 'no external requests']
+
+[author]
+  name = 'Joshua Winters-Brown'
+  homepage = 'https://www.unorthodoxdev.net/'
+
+[hugo]
+  min = '0.128.0'
+  extended = false

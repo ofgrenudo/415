@@ -1,0 +1,44 @@
+{{ with .Site.Params.comment_server }} 
+<link rel="stylesheet" href="/css/guestbook.css" />
+<div class="comment_block" id="comment_block">
+  <form
+    action="{{ . }}/api/v1/guestbook"
+    method="POST"
+    onsubmit="update_post_url()"
+  >
+    <label for="username">- what do people call you?</label><br />
+    <input
+      type="text"
+      class="comment_inputs"
+      id="username"
+      name="username"
+      required
+    /><br /><br />
+    <label for="comment">- thoughts, concerns, complaints, opinions?</label
+    ><br />
+    <textarea
+      class="comment_inputs"
+      id="comment"
+      name="comment"
+      rows="4"
+      cols="50"
+      required
+    ></textarea
+    ><br /><br />
+    <input
+      type="text"
+      class="comment_inputs"
+      id="post_url"
+      name="post_url"
+      placeholder="<changeme_programatically>"
+      required
+      readonly
+      hidden
+    />
+    <input class="comment_inputs comment_button" type="submit" value="Submit" />
+  </form>
+</div>
+<hr />
+<div id="opinions"></div>
+<script src="/js/guestbook.js"></script>
+{{ end }}

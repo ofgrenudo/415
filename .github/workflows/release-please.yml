@@ -13,12 +13,16 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      dyndns_released: ${{ steps.release.outputs['cmd/dynDNS--release_created'] }}
-      dyndns_tag: ${{ steps.release.outputs['cmd/dynDNS--tag_name'] }}
-      c415_released: ${{ steps.release.outputs['cmd/415--release_created'] }}
-      c415_tag: ${{ steps.release.outputs['cmd/415--tag_name'] }}
-      example_released: ${{ steps.release.outputs['cmd/example--release_created'] }}
-      example_tag: ${{ steps.release.outputs['cmd/example--tag_name'] }}
+      dyndns_released: ${{ steps.release.outputs['apps/dyndns--release_created'] }}
+      dyndns_tag: ${{ steps.release.outputs['apps/dyndns--tag_name'] }}
+      c415_released: ${{ steps.release.outputs['apps/api--release_created'] }}
+      c415_tag: ${{ steps.release.outputs['apps/api--tag_name'] }}
+      example_released: ${{ steps.release.outputs['apps/example--release_created'] }}
+      example_tag: ${{ steps.release.outputs['apps/example--tag_name'] }}
+      c415_version: ${{ steps.release.outputs['apps/api--version'] }}
+      website_version: ${{ steps.release.outputs['apps/website--version'] }}
+      website_released: ${{ steps.release.outputs['apps/website--release_created'] }}
+      website_tag: ${{ steps.release.outputs['apps/website--tag_name'] }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -44,11 +48,11 @@ jobs:
           TAG="${{ needs.release-please.outputs.dyndns_tag }}"
           VERSION="${TAG#dynDNS-v}"
           COMMIT="$(git rev-parse --short HEAD)"
-          make dynDNS VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
+          make dyndns VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
       - name: Upload release asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ needs.release-please.outputs.dyndns_tag }}" "bin/dynDNS" --clobber
+        run: gh release upload "${{ needs.release-please.outputs.dyndns_tag }}" "bin/dyndns" --clobber
 
   build-and-upload-415:
     needs: release-please
@@ -68,11 +72,11 @@ jobs:
           TAG="${{ needs.release-please.outputs.c415_tag }}"
           VERSION="${TAG#415-v}"
           COMMIT="$(git rev-parse --short HEAD)"
-          make 415 VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
+          make api VERSION="$VERSION" COMMIT="$COMMIT" AUTHOR="ofgrenudo/415"
       - name: Upload release asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ needs.release-please.outputs.c415_tag }}" "bin/415" --clobber
+        run: gh release upload "${{ needs.release-please.outputs.c415_tag }}" "bin/api" --clobber
 
   build-and-upload-example:
     needs: release-please
@@ -97,3 +101,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ needs.release-please.outputs.example_tag }}" "bin/example" --clobber
+
+  publish-image-api:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.c415_released == 'true' }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      image: 415-api
+      ref: ${{ needs.release-please.outputs.c415_tag }}
+      version: ${{ needs.release-please.outputs.c415_version }}
+      dockerfile: apps/api/Dockerfile
+
+  publish-image-website:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.website_released == 'true' }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      image: 415-website
+      ref: ${{ needs.release-please.outputs.website_tag }}
+      version: ${{ needs.release-please.outputs.website_version }}
+      context: apps/website
+      dockerfile: apps/website/Dockerfile
